@@ -2,11 +2,6 @@ package com.example.webactivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,6 +20,9 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.example.webactivity.ConnectivityHelper.hasActiveInternetConnection;
+import static com.example.webactivity.ConnectivityHelper.isNetworkConnected;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,40 +62,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        try {
-            if (isNetworkConnected(getApplicationContext())) {
-//                Toast.makeText(getApplicationContext(),
-//                        "Инет есть!", Toast.LENGTH_SHORT).show();
-            } else {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            while (!isInterrupted()) {
-                                Thread.sleep(10000);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //CALL ANY METHOD OR ANY URL OR FUNCTION or any view
-                                        Toast.makeText(getApplicationContext(),
-                                                "Отсутствует интернет соединение", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                        startActivity(getIntent());
-                                    }
-                                });
-                            }
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                }.start();
-//                Toast.makeText(getApplicationContext(),
-//                    "Отсутствует интернет соединение", Toast.LENGTH_SHORT).show();
-//                finish();
-//                startActivity(getIntent());
-            }
-        } catch (Exception e){
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+//        checkConnection();
 
         stringRequestGet();
     }
@@ -142,39 +107,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static boolean isNetworkConnected(Context context) {
-        boolean result = false;
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        // для 28+ версии
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (cm != null) {
-                NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
-                if (capabilities != null) {
-                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                        result = true;
-                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                        result = true;
-                    }
-                }
-            }
-        } else {
-            // до 28+ версии
-            if (cm != null) {
-                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                if (activeNetwork != null) {
-                    // connected to the internet
-                    if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                        result = true;
-                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                        result = true;
-                    }
-                }
-            }
-        }
-        return result;
-    }
+//    public void checkConnection() {
+//
+//        if(hasActiveInternetConnection(getApplicationContext())) {
+//            Log.d("internet status","Internet Access");
+//            stringRequestGet();
+//        } else {
+//            Log.d("internet status","no Internet Access");
+//            Toast.makeText(getApplicationContext(),
+//                    "Отсутствует интернет соединение", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
-    // Кнопка назад
     public void onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();
